@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- This viewport tag forces mobile devices to scale correctly -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Devig & Kelly Calculator</title>
     <style>
@@ -16,7 +15,6 @@
             --border-color: #1f2937;
         }
 
-        /* Increased base size to scale up all rem measurements globally */
         html {
             font-size: 18px; 
         }
@@ -252,7 +250,6 @@
             border-color: #660000;
         }
 
-        /* Mobile specific overrides for edge-to-edge native feel */
         @media (max-width: 600px) {
             body {
                 padding: 0;
@@ -291,12 +288,12 @@
         
         <div class="divider"></div>
 
-        <div style="color: var(--text-muted); font-size: 0.85rem; letter-spacing: 1.5px; margin-bottom: 12px; font-weight: bold;">BANKROLL SETUP</div>
+        <div style="color: var(--text-muted); font-size: 0.85rem; letter-spacing: 1.5px; margin-bottom: 12px; font-weight: bold;">UNIT SIZE SETUP</div>
         <div class="input-grid input-full">
             <div class="input-group has-currency" style="padding-bottom: 20px;">
-                <label>Total Bankroll</label>
+                <label>Base Unit Size</label>
                 <span class="currency-symbol">$</span>
-                <input type="number" id="bankroll" placeholder="1000" step="1">
+                <input type="number" id="unitSize" placeholder="25" step="1">
             </div>
         </div>
 
@@ -390,7 +387,7 @@
         }
 
         function clearFields() {
-            document.getElementById('bankroll').value = '';
+            document.getElementById('unitSize').value = '';
             document.getElementById('sharp1').value = '-115';
             document.getElementById('sharp2').value = '-101';
             document.getElementById('avail1').value = '';
@@ -399,7 +396,7 @@
             window.scrollTo(0, 0);
         }
 
-        function calculateKellyAndEdge(trueProb, availOdds, containerId, textId, bankroll) {
+        function calculateKellyAndEdge(trueProb, availOdds, containerId, textId, unitSize) {
             const container = document.getElementById(containerId);
             const textEl = document.getElementById(textId);
             
@@ -423,8 +420,10 @@
                 textEl.classList.remove('negative-ev');
                 
                 let recommendation = `${halfKelly.toFixed(2)} Units`;
-                if (bankroll > 0) {
-                    let dollarWager = (halfKelly / 100) * bankroll;
+                
+                // Now treating the input as a flat Base Unit Size instead of total bankroll
+                if (unitSize > 0) {
+                    let dollarWager = halfKelly * unitSize;
                     recommendation += ` ($${dollarWager.toFixed(2)})`;
                 }
                 
@@ -437,7 +436,7 @@
         }
 
         function calculate() {
-            let bankroll = parseFloat(document.getElementById('bankroll').value);
+            let unitSize = parseFloat(document.getElementById('unitSize').value);
             let s1 = parseFloat(document.getElementById('sharp1').value);
             let s2 = parseFloat(document.getElementById('sharp2').value);
             let a1 = parseFloat(document.getElementById('avail1').value);
@@ -462,12 +461,11 @@
             document.getElementById('res-prob').innerText = `${(trueP1 * 100).toFixed(2)}%`;
             document.getElementById('res-vig').innerText = `${((totalImplied - 1) * 100).toFixed(2)}%`;
 
-            calculateKellyAndEdge(trueP1, a1, 'kelly-container1', 'res-kelly1', bankroll);
-            calculateKellyAndEdge(trueP2, a2, 'kelly-container2', 'res-kelly2', bankroll);
+            calculateKellyAndEdge(trueP1, a1, 'kelly-container1', 'res-kelly1', unitSize);
+            calculateKellyAndEdge(trueP2, a2, 'kelly-container2', 'res-kelly2', unitSize);
 
             document.getElementById('results').style.display = 'block';
             
-            // Auto-scroll slightly so results are fully visible on smaller screens
             setTimeout(() => {
                 document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }, 100);
