@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    /* Added user-scalable=no to prevent unwanted zooming on mobile input focus */
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Devig & Kelly Calculator</title>
     <style>
         :root {
@@ -15,16 +16,22 @@
             --border-color: #1f2937;
         }
 
+        /* Set a consistent base font size so mobile browsers don't shrink it */
+        html {
+            font-size: 16px; 
+        }
+
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start; /* Moved to top so keyboard doesn't hide UI */
             min-height: 100vh;
             margin: 0;
-            padding: 20px;
+            padding: 40px 20px;
+            box-sizing: border-box;
         }
 
         .calculator-card {
@@ -90,6 +97,8 @@
             padding: 15px;
             border-top: 1px solid rgba(0, 255, 136, 0.3);
             position: relative;
+            display: flex;
+            flex-direction: column;
         }
 
         .input-group label {
@@ -115,7 +124,7 @@
         .currency-symbol {
             position: absolute;
             left: 15px;
-            bottom: 18px;
+            bottom: 18px; /* Adjusted for bankroll input */
             font-size: 1.8rem;
             font-weight: bold;
             color: var(--text-muted);
@@ -130,11 +139,29 @@
             color: #2d3748;
         }
 
-        /* Number input arrows removal */
+        /* Hide HTML5 number spinners */
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { 
             -webkit-appearance: none; 
             margin: 0; 
+        }
+
+        /* Toggle Button Styling */
+        .toggle-btn {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+            cursor: pointer;
+            text-transform: uppercase;
+            user-select: none; /* Prevents text highlighting when tapping rapidly */
+        }
+
+        .toggle-btn:hover {
+            color: var(--neon-green);
         }
 
         .btn-calc {
@@ -153,9 +180,8 @@
             margin-bottom: 10px;
         }
 
-        .btn-calc:hover {
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
-            transform: translateY(-1px);
+        .btn-calc:active {
+            transform: scale(0.98);
         }
 
         .btn-clear {
@@ -171,11 +197,6 @@
             text-transform: uppercase;
         }
 
-        .btn-clear:hover {
-            color: var(--text-main);
-            background: #1f2937;
-        }
-
         #results {
             display: none;
             margin-top: 25px;
@@ -187,7 +208,7 @@
             display: flex;
             justify-content: space-between;
             margin-bottom: 10px;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
         }
 
         .result-val {
@@ -214,10 +235,10 @@
         }
 
         .kelly-highlight .val {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             color: var(--neon-green);
             font-weight: bold;
-            line-height: 1.3;
+            line-height: 1.4;
         }
 
         .negative-ev {
@@ -226,6 +247,25 @@
         .negative-bg {
             background: rgba(255, 68, 68, 0.1);
             border-color: #660000;
+        }
+
+        /* Mobile specific adjustments to ensure it isn't tiny */
+        @media (max-width: 480px) {
+            body {
+                padding: 15px 10px;
+            }
+            .calculator-card {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.6rem;
+            }
+            .input-group input {
+                font-size: 1.5rem; 
+            }
+            .input-grid {
+                gap: 10px;
+            }
         }
     </style>
 </head>
@@ -240,7 +280,7 @@
 
         <div style="color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; margin-bottom: 10px;">BANKROLL SETUP</div>
         <div class="input-grid input-full">
-            <div class="input-group has-currency">
+            <div class="input-group has-currency" style="padding-bottom: 15px;"> <!-- Removed toggle from bankroll -->
                 <label>Total Bankroll</label>
                 <span class="currency-symbol">$</span>
                 <input type="number" id="bankroll" placeholder="1000" step="1">
@@ -251,11 +291,13 @@
         <div class="input-grid">
             <div class="input-group">
                 <label>Side 1</label>
-                <input type="number" id="sharp1" value="-110" step="1">
+                <input type="number" id="sharp1" value="-115" step="1">
+                <div class="toggle-btn" onclick="toggleSign('sharp1')">+/- Toggle</div>
             </div>
             <div class="input-group">
                 <label>Side 2</label>
-                <input type="number" id="sharp2" value="-110" step="1">
+                <input type="number" id="sharp2" value="-101" step="1">
+                <div class="toggle-btn" onclick="toggleSign('sharp2')">+/- Toggle</div>
             </div>
         </div>
 
@@ -263,11 +305,13 @@
         <div class="input-grid">
             <div class="input-group">
                 <label>Side 1 Odds</label>
-                <input type="number" id="avail1" placeholder="+100" step="1">
+                <input type="number" id="avail1" placeholder="100" step="1">
+                <div class="toggle-btn" onclick="toggleSign('avail1')">+/- Toggle</div>
             </div>
             <div class="input-group">
                 <label>Side 2 Odds</label>
                 <input type="number" id="avail2" placeholder="+100" step="1">
+                <div class="toggle-btn" onclick="toggleSign('avail2')">+/- Toggle</div>
             </div>
         </div>
 
@@ -301,6 +345,19 @@
     </div>
 
     <script>
+        // Flips the input value between positive and negative
+        function toggleSign(elementId) {
+            let el = document.getElementById(elementId);
+            let val = parseFloat(el.value);
+            
+            // If empty or NaN, default to a negative number to start
+            if (isNaN(val)) {
+                el.value = -110;
+            } else if (val !== 0) {
+                el.value = val * -1;
+            }
+        }
+
         function americanToProb(odds) {
             if (odds < 0) return Math.abs(odds) / (Math.abs(odds) + 100);
             return 100 / (odds + 100);
@@ -323,8 +380,8 @@
 
         function clearFields() {
             document.getElementById('bankroll').value = '';
-            document.getElementById('sharp1').value = '-110';
-            document.getElementById('sharp2').value = '-110';
+            document.getElementById('sharp1').value = '-115';
+            document.getElementById('sharp2').value = '-101';
             document.getElementById('avail1').value = '';
             document.getElementById('avail2').value = '';
             document.getElementById('results').style.display = 'none';
@@ -355,7 +412,8 @@
                 container.classList.remove('negative-bg');
                 textEl.classList.remove('negative-ev');
                 
-                let recommendation = `${halfKelly.toFixed(2)}% Unit`;
+                // Formatted as standard betting units without the % sign
+                let recommendation = `${halfKelly.toFixed(2)} Units`;
                 if (bankroll > 0) {
                     let dollarWager = (halfKelly / 100) * bankroll;
                     recommendation += ` ($${dollarWager.toFixed(2)})`;
