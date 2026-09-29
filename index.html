@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    /* Added user-scalable=no to prevent unwanted zooming on mobile input focus */
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Devig & Kelly Calculator</title>
     <style>
@@ -16,7 +15,6 @@
             --border-color: #1f2937;
         }
 
-        /* Set a consistent base font size so mobile browsers don't shrink it */
         html {
             font-size: 16px; 
         }
@@ -27,7 +25,7 @@
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Moved to top so keyboard doesn't hide UI */
+            align-items: flex-start;
             min-height: 100vh;
             margin: 0;
             padding: 40px 20px;
@@ -124,7 +122,7 @@
         .currency-symbol {
             position: absolute;
             left: 15px;
-            bottom: 18px; /* Adjusted for bankroll input */
+            bottom: 18px;
             font-size: 1.8rem;
             font-weight: bold;
             color: var(--text-muted);
@@ -139,14 +137,12 @@
             color: #2d3748;
         }
 
-        /* Hide HTML5 number spinners */
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { 
             -webkit-appearance: none; 
             margin: 0; 
         }
 
-        /* Toggle Button Styling */
         .toggle-btn {
             text-align: center;
             color: var(--text-muted);
@@ -157,7 +153,7 @@
             border-top: 1px solid var(--border-color);
             cursor: pointer;
             text-transform: uppercase;
-            user-select: none; /* Prevents text highlighting when tapping rapidly */
+            user-select: none;
         }
 
         .toggle-btn:hover {
@@ -249,7 +245,6 @@
             border-color: #660000;
         }
 
-        /* Mobile specific adjustments to ensure it isn't tiny */
         @media (max-width: 480px) {
             body {
                 padding: 15px 10px;
@@ -280,7 +275,7 @@
 
         <div style="color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; margin-bottom: 10px;">BANKROLL SETUP</div>
         <div class="input-grid input-full">
-            <div class="input-group has-currency" style="padding-bottom: 15px;"> <!-- Removed toggle from bankroll -->
+            <div class="input-group has-currency" style="padding-bottom: 15px;">
                 <label>Total Bankroll</label>
                 <span class="currency-symbol">$</span>
                 <input type="number" id="bankroll" placeholder="1000" step="1">
@@ -345,12 +340,10 @@
     </div>
 
     <script>
-        // Flips the input value between positive and negative
         function toggleSign(elementId) {
             let el = document.getElementById(elementId);
             let val = parseFloat(el.value);
             
-            // If empty or NaN, default to a negative number to start
             if (isNaN(val)) {
                 el.value = -110;
             } else if (val !== 0) {
@@ -399,10 +392,8 @@
             let dec = americanToDecimal(availOdds);
             let b = dec - 1; 
             
-            // Edge = (True Prob * Decimal Odds) - 1
             let edge = (trueProb * dec) - 1;
             
-            // Kelly Formula: f = (bp - q) / b  [where q = 1 - p]
             let kelly = (trueProb * b - (1 - trueProb)) / b;
             let halfKelly = (kelly / 2) * 100;
 
@@ -412,7 +403,6 @@
                 container.classList.remove('negative-bg');
                 textEl.classList.remove('negative-ev');
                 
-                // Formatted as standard betting units without the % sign
                 let recommendation = `${halfKelly.toFixed(2)} Units`;
                 if (bankroll > 0) {
                     let dollarWager = (halfKelly / 100) * bankroll;
@@ -443,7 +433,6 @@
             let p2 = americanToProb(s2);
             let totalImplied = p1 + p2;
 
-            // Multiplicative Devig Method
             let trueP1 = p1 / totalImplied;
             let trueP2 = p2 / totalImplied;
 
@@ -454,7 +443,6 @@
             document.getElementById('res-prob').innerText = `${(trueP1 * 100).toFixed(2)}%`;
             document.getElementById('res-vig').innerText = `${((totalImplied - 1) * 100).toFixed(2)}%`;
 
-            // Calculate Edge and Half-Kelly for Side 1 and Side 2 if inputs exist
             calculateKellyAndEdge(trueP1, a1, 'kelly-container1', 'res-kelly1', bankroll);
             calculateKellyAndEdge(trueP2, a2, 'kelly-container2', 'res-kelly2', bankroll);
 
