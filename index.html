@@ -134,6 +134,20 @@
             padding-left: 35px;
         }
 
+        .percent-symbol {
+            position: absolute;
+            right: 20px;
+            bottom: 40px;
+            font-size: 2.4rem;
+            font-weight: bold;
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        .has-percent input {
+            padding-right: 45px;
+        }
+
         .input-group input::placeholder {
             color: #2d3748;
         }
@@ -276,6 +290,14 @@
             .has-currency input {
                 padding-left: 30px;
             }
+            .percent-symbol {
+                font-size: 2.2rem;
+                bottom: 39px;
+                right: 15px;
+            }
+            .has-percent input {
+                padding-right: 35px;
+            }
         }
     </style>
 </head>
@@ -352,6 +374,25 @@
                 <div class="val" id="res-kelly2"></div>
             </div>
         </div>
+
+        <!-- NEW QUICK CONVERTER SECTION -->
+        <div class="divider" style="margin-top: 40px;"></div>
+        <div style="color: var(--text-muted); font-size: 0.85rem; letter-spacing: 1.5px; margin-bottom: 12px; font-weight: bold; text-transform: uppercase;">Quick Converter</div>
+        <div class="input-grid">
+            <div class="input-group">
+                <label>American Odds</label>
+                <input type="number" id="conv-amer" placeholder="-110" step="1" oninput="runConverter('amer')">
+                <div class="toggle-btn" onclick="toggleSign('conv-amer')">+/- Toggle</div>
+            </div>
+            <div class="input-group has-percent">
+                <label>Implied Prob</label>
+                <input type="number" id="conv-prob" placeholder="52.38" step="0.01" oninput="runConverter('prob')">
+                <span class="percent-symbol">%</span>
+                <!-- Invisible toggle button to keep both boxes exactly the same height -->
+                <div class="toggle-btn" style="visibility: hidden;">+/- Toggle</div>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -364,6 +405,9 @@
             } else if (val !== 0) {
                 el.value = val * -1;
             }
+            
+            // Fires an input event so the quick converter auto-calculates when you tap the toggle
+            el.dispatchEvent(new Event('input'));
         }
 
         function americanToProb(odds) {
@@ -380,6 +424,15 @@
                 return "+" + odds;
             }
         }
+        
+        // Formats American odds purely as an integer (strips the "+" string) for number input fields
+        function probToAmericanNum(prob) {
+            if (prob > 0.5) {
+                return Math.round(- (prob * 100) / (1 - prob));
+            } else {
+                return Math.round(((1 - prob) * 100) / prob);
+            }
+        }
 
         function americanToDecimal(odds) {
             if (odds > 0) return (odds / 100) + 1;
@@ -392,8 +445,34 @@
             document.getElementById('sharp2').value = '-101';
             document.getElementById('avail1').value = '';
             document.getElementById('avail2').value = '';
+            document.getElementById('conv-amer').value = '';
+            document.getElementById('conv-prob').value = '';
             document.getElementById('results').style.display = 'none';
             window.scrollTo(0, 0);
+        }
+
+        function runConverter(source) {
+            let amerEl = document.getElementById('conv-amer');
+            let probEl = document.getElementById('conv-prob');
+
+            if (source === 'amer') {
+                let val = parseFloat(amerEl.value);
+                if (isNaN(val) || val === 0) {
+                    probEl.value = '';
+                    return;
+                }
+                let prob = americanToProb(val);
+                probEl.value = (prob * 100).toFixed(2);
+            } 
+            else if (source === 'prob') {
+                let val = parseFloat(probEl.value);
+                if (isNaN(val) || val <= 0 || val >= 100) {
+                    amerEl.value = '';
+                    return;
+                }
+                let prob = val / 100;
+                amerEl.value = probToAmericanNum(prob);
+            }
         }
 
         function calculateKellyAndEdge(trueProb, availOdds, containerId, textId, unitSize) {
@@ -421,7 +500,6 @@
                 
                 let recommendation = `${halfKelly.toFixed(2)} Units`;
                 
-                // Now treating the input as a flat Base Unit Size instead of total bankroll
                 if (unitSize > 0) {
                     let dollarWager = halfKelly * unitSize;
                     recommendation += ` ($${dollarWager.toFixed(2)})`;
