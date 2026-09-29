@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- This viewport tag forces mobile devices to scale correctly -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Devig & Kelly Calculator</title>
     <style>
         :root {
@@ -15,8 +16,9 @@
             --border-color: #1f2937;
         }
 
+        /* Increased base size to scale up all rem measurements globally */
         html {
-            font-size: 16px; 
+            font-size: 18px; 
         }
 
         body {
@@ -28,35 +30,35 @@
             align-items: flex-start;
             min-height: 100vh;
             margin: 0;
-            padding: 40px 20px;
+            padding: 20px;
             box-sizing: border-box;
         }
 
         .calculator-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-top: 2px solid var(--neon-green);
-            border-radius: 8px;
-            padding: 30px;
+            border-top: 3px solid var(--neon-green);
+            border-radius: 12px;
+            padding: 40px;
             width: 100%;
-            max-width: 500px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
         }
 
         .header-tag {
             color: var(--neon-green);
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             letter-spacing: 2px;
             text-transform: uppercase;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             background: rgba(0, 255, 136, 0.1);
             display: inline-block;
-            padding: 4px 8px;
+            padding: 6px 10px;
             border-radius: 4px;
         }
 
         h1 {
-            font-size: 2rem;
+            font-size: 2.4rem;
             margin: 5px 0 0 0;
             font-weight: 800;
             text-transform: uppercase;
@@ -65,15 +67,15 @@
 
         .subtitle {
             color: var(--text-muted);
-            font-size: 0.85rem;
-            margin-bottom: 25px;
+            font-size: 0.95rem;
+            margin-bottom: 30px;
             font-family: monospace;
         }
 
         .divider {
             height: 2px;
             background: var(--neon-green);
-            margin-bottom: 25px;
+            margin-bottom: 30px;
             box-shadow: 0 0 10px var(--neon-green);
         }
 
@@ -91,8 +93,8 @@
         .input-group {
             background: #0d131a;
             border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 15px;
+            border-radius: 8px;
+            padding: 20px;
             border-top: 1px solid rgba(0, 255, 136, 0.3);
             position: relative;
             display: flex;
@@ -102,10 +104,11 @@
         .input-group label {
             display: block;
             color: var(--text-muted);
-            font-size: 0.75rem;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
+            font-size: 0.85rem;
+            letter-spacing: 1.5px;
+            margin-bottom: 12px;
             text-transform: uppercase;
+            font-weight: bold;
         }
 
         .input-group input {
@@ -113,7 +116,7 @@
             background: transparent;
             border: none;
             color: var(--text-main);
-            font-size: 1.8rem;
+            font-size: 2.4rem;
             font-weight: bold;
             outline: none;
             text-align: left;
@@ -121,16 +124,16 @@
         
         .currency-symbol {
             position: absolute;
-            left: 15px;
-            bottom: 18px;
-            font-size: 1.8rem;
+            left: 20px;
+            bottom: 24px;
+            font-size: 2.4rem;
             font-weight: bold;
             color: var(--text-muted);
             pointer-events: none;
         }
         
         .has-currency input {
-            padding-left: 25px;
+            padding-left: 35px;
         }
 
         .input-group input::placeholder {
@@ -146,14 +149,15 @@
         .toggle-btn {
             text-align: center;
             color: var(--text-muted);
-            font-size: 0.7rem;
+            font-size: 0.85rem;
             letter-spacing: 2px;
             margin-top: 15px;
-            padding-top: 10px;
+            padding-top: 15px;
             border-top: 1px solid var(--border-color);
             cursor: pointer;
             text-transform: uppercase;
             user-select: none;
+            font-weight: bold;
         }
 
         .toggle-btn:hover {
@@ -165,15 +169,16 @@
             background: var(--neon-green);
             color: #000;
             border: none;
-            padding: 15px;
-            font-size: 1.1rem;
+            padding: 20px;
+            font-size: 1.3rem;
             font-weight: 800;
             letter-spacing: 2px;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             text-transform: uppercase;
             transition: all 0.2s;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            margin-top: 10px;
         }
 
         .btn-calc:active {
@@ -185,26 +190,27 @@
             background: transparent;
             color: var(--text-muted);
             border: 1px solid var(--border-color);
-            padding: 10px;
-            font-size: 0.8rem;
+            padding: 15px;
+            font-size: 0.95rem;
             letter-spacing: 2px;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             text-transform: uppercase;
+            font-weight: bold;
         }
 
         #results {
             display: none;
-            margin-top: 25px;
-            padding-top: 25px;
+            margin-top: 30px;
+            padding-top: 30px;
             border-top: 1px dashed var(--border-color);
         }
 
         .result-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 0.95rem;
+            margin-bottom: 15px;
+            font-size: 1.05rem;
         }
 
         .result-val {
@@ -213,28 +219,29 @@
         }
 
         .kelly-highlight {
-            margin-top: 15px;
+            margin-top: 20px;
             background: rgba(0, 255, 136, 0.1);
-            padding: 15px;
-            border-radius: 6px;
+            padding: 20px;
+            border-radius: 8px;
             border: 1px solid var(--dark-green);
             text-align: center;
         }
 
         .kelly-highlight span {
             display: block;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             color: var(--text-muted);
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 1px;
+            font-weight: bold;
         }
 
         .kelly-highlight .val {
-            font-size: 1.4rem;
+            font-size: 1.6rem;
             color: var(--neon-green);
             font-weight: bold;
-            line-height: 1.4;
+            line-height: 1.5;
         }
 
         .negative-ev {
@@ -245,21 +252,32 @@
             border-color: #660000;
         }
 
-        @media (max-width: 480px) {
+        /* Mobile specific overrides for edge-to-edge native feel */
+        @media (max-width: 600px) {
             body {
-                padding: 15px 10px;
+                padding: 0;
             }
             .calculator-card {
-                padding: 20px;
-            }
-            h1 {
-                font-size: 1.6rem;
-            }
-            .input-group input {
-                font-size: 1.5rem; 
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+                border-top: 4px solid var(--neon-green);
+                padding: 30px 20px 50px 20px;
+                min-height: 100vh;
             }
             .input-grid {
-                gap: 10px;
+                gap: 12px;
+            }
+            .input-group input {
+                font-size: 2.2rem; 
+            }
+            .currency-symbol {
+                font-size: 2.2rem;
+                bottom: 23px;
+                left: 15px;
+            }
+            .has-currency input {
+                padding-left: 30px;
             }
         }
     </style>
@@ -273,16 +291,16 @@
         
         <div class="divider"></div>
 
-        <div style="color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; margin-bottom: 10px;">BANKROLL SETUP</div>
+        <div style="color: var(--text-muted); font-size: 0.85rem; letter-spacing: 1.5px; margin-bottom: 12px; font-weight: bold;">BANKROLL SETUP</div>
         <div class="input-grid input-full">
-            <div class="input-group has-currency" style="padding-bottom: 15px;">
+            <div class="input-group has-currency" style="padding-bottom: 20px;">
                 <label>Total Bankroll</label>
                 <span class="currency-symbol">$</span>
                 <input type="number" id="bankroll" placeholder="1000" step="1">
             </div>
         </div>
 
-        <div style="color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; margin-bottom: 10px;">SHARP ODDS INPUT (e.g. Pinnacle)</div>
+        <div style="color: var(--text-muted); font-size: 0.85rem; letter-spacing: 1.5px; margin-bottom: 12px; font-weight: bold; margin-top: 25px;">SHARP ODDS INPUT (e.g. Pinnacle)</div>
         <div class="input-grid">
             <div class="input-group">
                 <label>Side 1</label>
@@ -296,7 +314,7 @@
             </div>
         </div>
 
-        <div style="color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; margin-bottom: 10px;">AVAILABLE ODDS (YOUR BOOK)</div>
+        <div style="color: var(--text-muted); font-size: 0.85rem; letter-spacing: 1.5px; margin-bottom: 12px; font-weight: bold; margin-top: 25px;">AVAILABLE ODDS (YOUR BOOK)</div>
         <div class="input-grid">
             <div class="input-group">
                 <label>Side 1 Odds</label>
@@ -315,11 +333,11 @@
 
         <div id="results">
             <div class="result-row">
-                <span>Fair Odds (Side 1 / Side 2)</span>
+                <span>Fair Odds (S1 / S2)</span>
                 <span class="result-val" id="res-fair"></span>
             </div>
             <div class="result-row">
-                <span>True Win Probability (Side 1)</span>
+                <span>True Win Prob (S1)</span>
                 <span class="result-val" id="res-prob"></span>
             </div>
             <div class="result-row">
@@ -378,6 +396,7 @@
             document.getElementById('avail1').value = '';
             document.getElementById('avail2').value = '';
             document.getElementById('results').style.display = 'none';
+            window.scrollTo(0, 0);
         }
 
         function calculateKellyAndEdge(trueProb, availOdds, containerId, textId, bankroll) {
@@ -447,6 +466,11 @@
             calculateKellyAndEdge(trueP2, a2, 'kelly-container2', 'res-kelly2', bankroll);
 
             document.getElementById('results').style.display = 'block';
+            
+            // Auto-scroll slightly so results are fully visible on smaller screens
+            setTimeout(() => {
+                document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
         }
     </script>
 </body>
