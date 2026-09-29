@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devig & Kelly Calculator</title>
+    <style>
+        :root {
+            --bg-color: #0b111a;
+            --card-bg: #121921;
+            --neon-green: #00ff88;
+            --dark-green: #004d29;
+            --text-main: #ffffff;
+            --text-muted: #4b5563;
+            --border-color: #1f2937;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .calculator-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-top: 2px solid var(--neon-green);
+            border-radius: 8px;
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .header-tag {
+            color: var(--neon-green);
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            background: rgba(0, 255, 136, 0.1);
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin: 5px 0 0 0;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 25px;
+            font-family: monospace;
+        }
+
+        .divider {
+            height: 2px;
+            background: var(--neon-green);
+            margin-bottom: 25px;
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .input-full {
+            grid-template-columns: 1fr;
+        }
+
+        .input-group {
+            background: #0d131a;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 15px;
+            border-top: 1px solid rgba(0, 255, 136, 0.3);
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .input-group input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.8rem;
+            font-weight: bold;
+            outline: none;
+            text-align: left;
+        }
+        
+        .currency-symbol {
+            position: absolute;
+            left: 15px;
+            bottom: 18px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+        
+        .has-currency input {
+            padding-left: 25px;
+        }
+
+        .input-group input::placeholder {
+            color: #2d3748;
+        }
+
+        /* Number input arrows removal */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+
+        .btn-calc {
+            width: 100%;
+            background: var(--neon-green);
+            color: #000;
+            border: none;
+            padding: 15px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s;
+            margin-bottom: 10px;
+        }
+
+        .btn-calc:hover {
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .btn-clear {
+            width: 100%;
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .btn-clear:hover {
+            color: var(--text-main);
+            background: #1f2937;
+        }
+
+        #results {
+            display: none;
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .result-val {
+            font-weight: bold;
+            color: var(--neon-green);
+        }
+
+        .kelly-highlight {
+            margin-top: 15px;
+            background: rgba(0, 255, 136, 0.1);
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid var(--dark-green);
+            text-align: center;
+        }
+
+        .kelly-highlight span {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .kelly-highlight .val {
+            font-size: 1.5rem;
+            color: var(--neon-green);
+            font-weight: bold;
+            line-height: 1.3;
+        }
+
+        .negative-ev {
+            color: #ff4444 !important;
+        }
+        .negative-bg {
+            background: rgba(255, 68, 68, 0.1);
+            border-color: #660000;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator-card">
+        <div class="header-tag">Multiplicative Devig Engine</div>
+        <h1>No-Vig Calculator</h1>
+        <div class="subtitle">// STRIPS BOOKMAKER MARGIN &rarr; FAIR ODDS</div>
+        
+        <div class="divider"></div>
+
+        <div style="color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; margin-bottom: 10px;">BANKROLL SETUP</div>
+        <div class="input-grid input-full">
+            <div class="input-group has-currency">
+                <label>Total Bankroll</label>
+                <span class="currency-symbol">$</span>
+                <input type="number" id="bankroll" placeholder="1000" step="1">
+            </div>
+        </div>
+
+        <div style="color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; margin-bottom: 10px;">SHARP ODDS INPUT (e.g. Pinnacle)</div>
+        <div class="input-grid">
+            <div class="input-group">
+                <label>Side 1</label>
+                <input type="number" id="sharp1" value="-110" step="1">
+            </div>
+            <div class="input-group">
+                <label>Side 2</label>
+                <input type="number" id="sharp2" value="-110" step="1">
+            </div>
+        </div>
+
+        <div style="color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; margin-bottom: 10px;">AVAILABLE ODDS (YOUR BOOK)</div>
+        <div class="input-grid">
+            <div class="input-group">
+                <label>Side 1 Odds</label>
+                <input type="number" id="avail1" placeholder="+100" step="1">
+            </div>
+            <div class="input-group">
+                <label>Side 2 Odds</label>
+                <input type="number" id="avail2" placeholder="+100" step="1">
+            </div>
+        </div>
+
+        <button class="btn-calc" onclick="calculate()">Calculate</button>
+        <button class="btn-clear" onclick="clearFields()">Clear / Reset</button>
+
+        <div id="results">
+            <div class="result-row">
+                <span>Fair Odds (Side 1 / Side 2)</span>
+                <span class="result-val" id="res-fair"></span>
+            </div>
+            <div class="result-row">
+                <span>True Win Probability (Side 1)</span>
+                <span class="result-val" id="res-prob"></span>
+            </div>
+            <div class="result-row">
+                <span>Total Implied (Vig)</span>
+                <span class="result-val" id="res-vig"></span>
+            </div>
+            
+            <div id="kelly-container1" class="kelly-highlight" style="display:none;">
+                <span>Side 1: Edge & Half-Kelly</span>
+                <div class="val" id="res-kelly1"></div>
+            </div>
+
+            <div id="kelly-container2" class="kelly-highlight" style="display:none;">
+                <span>Side 2: Edge & Half-Kelly</span>
+                <div class="val" id="res-kelly2"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function americanToProb(odds) {
+            if (odds < 0) return Math.abs(odds) / (Math.abs(odds) + 100);
+            return 100 / (odds + 100);
+        }
+
+        function probToAmerican(prob) {
+            if (prob > 0.5) {
+                let odds = Math.round(- (prob * 100) / (1 - prob));
+                return odds > 0 ? "+" + odds : odds;
+            } else {
+                let odds = Math.round(((1 - prob) * 100) / prob);
+                return "+" + odds;
+            }
+        }
+
+        function americanToDecimal(odds) {
+            if (odds > 0) return (odds / 100) + 1;
+            return (100 / Math.abs(odds)) + 1;
+        }
+
+        function clearFields() {
+            document.getElementById('bankroll').value = '';
+            document.getElementById('sharp1').value = '-110';
+            document.getElementById('sharp2').value = '-110';
+            document.getElementById('avail1').value = '';
+            document.getElementById('avail2').value = '';
+            document.getElementById('results').style.display = 'none';
+        }
+
+        function calculateKellyAndEdge(trueProb, availOdds, containerId, textId, bankroll) {
+            const container = document.getElementById(containerId);
+            const textEl = document.getElementById(textId);
+            
+            if (isNaN(availOdds)) {
+                container.style.display = 'none';
+                return;
+            }
+
+            let dec = americanToDecimal(availOdds);
+            let b = dec - 1; 
+            
+            // Edge = (True Prob * Decimal Odds) - 1
+            let edge = (trueProb * dec) - 1;
+            
+            // Kelly Formula: f = (bp - q) / b  [where q = 1 - p]
+            let kelly = (trueProb * b - (1 - trueProb)) / b;
+            let halfKelly = (kelly / 2) * 100;
+
+            container.style.display = 'block';
+            
+            if (edge > 0) {
+                container.classList.remove('negative-bg');
+                textEl.classList.remove('negative-ev');
+                
+                let recommendation = `${halfKelly.toFixed(2)}% Unit`;
+                if (bankroll > 0) {
+                    let dollarWager = (halfKelly / 100) * bankroll;
+                    recommendation += ` ($${dollarWager.toFixed(2)})`;
+                }
+                
+                textEl.innerHTML = `+${(edge * 100).toFixed(2)}% EV <br> ${recommendation}`;
+            } else {
+                container.classList.add('negative-bg');
+                textEl.classList.add('negative-ev');
+                textEl.innerHTML = `${(edge * 100).toFixed(2)}% EV <br> Do Not Bet`;
+            }
+        }
+
+        function calculate() {
+            let bankroll = parseFloat(document.getElementById('bankroll').value);
+            let s1 = parseFloat(document.getElementById('sharp1').value);
+            let s2 = parseFloat(document.getElementById('sharp2').value);
+            let a1 = parseFloat(document.getElementById('avail1').value);
+            let a2 = parseFloat(document.getElementById('avail2').value);
+
+            if (isNaN(s1) || isNaN(s2)) {
+                alert("Please enter sharp odds for both sides.");
+                return;
+            }
+
+            let p1 = americanToProb(s1);
+            let p2 = americanToProb(s2);
+            let totalImplied = p1 + p2;
+
+            // Multiplicative Devig Method
+            let trueP1 = p1 / totalImplied;
+            let trueP2 = p2 / totalImplied;
+
+            let fair1 = probToAmerican(trueP1);
+            let fair2 = probToAmerican(trueP2);
+
+            document.getElementById('res-fair').innerText = `${fair1} / ${fair2}`;
+            document.getElementById('res-prob').innerText = `${(trueP1 * 100).toFixed(2)}%`;
+            document.getElementById('res-vig').innerText = `${((totalImplied - 1) * 100).toFixed(2)}%`;
+
+            // Calculate Edge and Half-Kelly for Side 1 and Side 2 if inputs exist
+            calculateKellyAndEdge(trueP1, a1, 'kelly-container1', 'res-kelly1', bankroll);
+            calculateKellyAndEdge(trueP2, a2, 'kelly-container2', 'res-kelly2', bankroll);
+
+            document.getElementById('results').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
